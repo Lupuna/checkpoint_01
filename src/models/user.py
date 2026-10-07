@@ -1,0 +1,6 @@
+CREATE_SQL = """
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL
+);
+"""

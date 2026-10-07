@@ -1,0 +1,24 @@
+[project]
+name = "checkpoint-01"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Ilua",email = "terragod427@gmail.com"}
+]
+requires-python = "^3.13"
+dependencies = [
+    "fastapi (>=0.142.2,<0.143.0)",
+    "openai (>=3.24.0,<4.0.0)",
+    "aiosqlite (>=0.22.1,<0.23.0)",
+    "uvicorn (>=0.54.0,<0.55.0)",
+    "python-dotenv (>=1.2.4,<2.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^9.1.1"
+
