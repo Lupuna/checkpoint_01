@@ -7,7 +7,7 @@
 | Часть | Где |
 |---|---|
 | Инструменты с правилами | `src/tools/order_tools.py` (`OrderTools`), схемы аргументов `src/schemas/tool_args.py`, описания для модели `src/tools/definitions.py` (`strict: true`) |
-| Системный промпт | `src/prompts/system.py`: роль, правила, база знаний, дата «сегодня» из `data/orders.json` |
+| Системный промпт | `src/prompts/system.py`: роль, правила ответа по документам, дата «сегодня» из `data/orders.json` |
 | Цикл агента | `src/services/chat.py`: Responses API без фреймворков, не больше 8 шагов на ход (`MAX_STEP`) |
 | Сервис | FastAPI, ответ стримится по SSE, история сессии хранится в SQLite (`support.db`, таблица `messages`) и переживает перезапуск |
 

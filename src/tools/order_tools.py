@@ -1,4 +1,5 @@
 import copy
+import inspect
 import json
 from collections.abc import Callable
 from datetime import date
@@ -6,6 +7,7 @@ from enum import StrEnum
 
 from pydantic import ValidationError
 
+from src.services.document import DocumentService
 from src.tools.definitions import TOOL_ARGS
 
 REFUND_DAYS = 14
@@ -23,7 +25,8 @@ NOT_SHIPPED = (OrderStatus.PLACED, OrderStatus.ASSEMBLED)
 
 
 class OrderTools:
-    def __init__(self, orders: dict[int, dict], today: date):
+    def __init__(self, orders: dict[int, dict], today: date, document_service: DocumentService | None = None):
+        self.document_service = document_service
         self._original = orders
         self.today = today
         self.orders: dict[int, dict] = {}
@@ -32,19 +35,22 @@ class OrderTools:
 
     @property
     def handlers(self) -> dict[str, Callable[..., dict]]:
-        return {
+        handlers = {
             "get_order": self.get_order,
             "cancel_order": self.cancel_order,
             "change_address": self.change_address,
             "create_refund": self.create_refund,
         }
+        if self.document_service is not None:
+            handlers["search_docs"] = self.search_docs
+        return handlers
 
     def reset(self) -> None:
         self.orders.clear()
         self.orders.update(copy.deepcopy(self._original))
         self.refunds.clear()
 
-    def run(self, name: str, arguments_json: str) -> str:
+    async def run(self, name: str, arguments_json: str) -> str:
         handler = self.handlers.get(name)
         if handler is None:
             result = {"error": f"Неизвестный инструмент: {name}", "hint": "Ответьте клиенту без этого инструмента"}
@@ -56,6 +62,8 @@ class OrderTools:
                           "hint": "Вызовите инструмент заново с аргументами по схеме"}
             else:
                 result = handler(**args.model_dump())
+                if inspect.isawaitable(result):
+                    result = await result
         return json.dumps(result, ensure_ascii=False)
 
     def get_order(self, order_id: int) -> dict:
@@ -144,6 +152,17 @@ class OrderTools:
                     "hint": f"Предложите возврат на сумму до {available} ₽"}
 
         return {"order_id": order_id, "refund": self._add_refund(order_id, amount_rub, reason)}
+
+    async def search_docs(self, query: str) -> dict:
+        chunks = await self.document_service.hybrid_search(query, k=5)
+        return {"fragments": [
+            {
+                "source": c["title"],
+                "pages": f"{c['page_start']}" if c["page_start"] == c["page_end"] else f"{c['page_start']}–{c['page_end']}",
+                "text": c["text"].replace("###", "\n"),
+            }
+            for c in chunks
+        ]}
 
     @staticmethod
     def _not_found(order_id: int) -> dict:

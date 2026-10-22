@@ -2,9 +2,11 @@ import aiosqlite
 from fastapi import Depends, Request
 from openai import AsyncOpenAI
 
+from src.repositories.document import DocumentRepository
 from src.repositories.session import SessionRepository
 from src.repositories.user import UserRepository
 from src.services.chat import ChatService
+from src.services.document import DocumentService
 from src.services.session import SessionService
 from src.services.user import UserService
 from src.tools.order_tools import OrderTools
@@ -47,3 +49,14 @@ def get_chat_service(
     order_tools: OrderTools = Depends(get_order_tools),
 ) -> ChatService:
     return ChatService(session_service, aclient, order_tools)
+
+
+def get_document_repository(database: aiosqlite.Connection = Depends(get_db)) -> DocumentRepository:
+    return DocumentRepository(database)
+
+
+def get_document_service(
+    repo: DocumentRepository = Depends(get_document_repository),
+    aclient: AsyncOpenAI = Depends(get_aclient),
+) -> DocumentService:
+    return DocumentService(repo, aclient)

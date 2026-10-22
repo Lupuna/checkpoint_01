@@ -4,6 +4,8 @@
 поменяйте импорты здесь, а не в тестах.
 """
 
+import asyncio
+
 
 # --- Урок 03: инструменты -----------------------------------------------------
 
@@ -25,7 +27,7 @@ def tools():
             self.impl.reset()
 
         def run_tool(self, name, arguments_json):
-            return self.impl.run(name, arguments_json)
+            return asyncio.run(self.impl.run(name, arguments_json))
 
     return Tools()
 

@@ -20,3 +20,10 @@ class ChangeAddressArgs(GetOrderArgs):
 class CreateRefundArgs(GetOrderArgs):
     amount_rub: int = Field(description="Сумма возврата в рублях")
     reason: str = Field(description="Причина возврата со слов клиента")
+
+
+class SearchDocsArgs(ToolArgs):
+    query: str = Field(
+        description="Поисковый запрос словами документа, а не клиента: «гарантийный срок бытовой техники», "
+                    "а не «на мой заказ ещё действует гарантия?». Без номеров заказов и обращений к клиенту."
+    )
