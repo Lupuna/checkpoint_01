@@ -1,10 +1,11 @@
 import aiosqlite
 
+from .models.document import CREATE_SQL as DOCUMENTS_SQL
 from .models.turn_item import CREATE_SQL as TURN_ITEMS_SQL
 from .models.session import CREATE_SQL as SESSIONS_SQL
 from .models.user import CREATE_SQL as USERS_SQL
 
-SCHEMA = USERS_SQL + SESSIONS_SQL + TURN_ITEMS_SQL
+SCHEMA = USERS_SQL + SESSIONS_SQL + TURN_ITEMS_SQL + DOCUMENTS_SQL
 
 
 async def open_db(database: aiosqlite.Connection) -> None:

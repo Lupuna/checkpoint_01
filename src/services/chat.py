@@ -67,7 +67,7 @@ class ChatService:
                 turn.append({
                     "type": "function_call_output",
                     "call_id": call.call_id,
-                    "output": self.order_tools.run(call.name, call.arguments),
+                    "output": await self.order_tools.run(call.name, call.arguments),
                 })
         else:
             fallback = self.FALLBACK
